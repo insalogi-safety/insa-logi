@@ -1,0 +1,182 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #ffffff;
+  color: #262626;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 350px;
+  margin: 60px auto 20px;
+  padding: 40px 30px;
+  border: 1px solid #dbdbdb;
+  text-align: center;
+  background: white;
+}
+
+.logo {
+  margin-bottom: 30px;
+}
+
+.logo-img {
+  width: 100px;
+  height: auto;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #fafafa;
+  border: 1px solid #dbdbdb;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  background: #4f5bd5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.login-btn:hover {
+  background: #4051c9;
+}
+
+.login-btn:disabled {
+  background: #b2dffc;
+  cursor: not-allowed;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.divider span {
+  flex: 1;
+  height: 1px;
+  background: #dbdbdb;
+}
+
+.divider p {
+  margin: 0 15px;
+  font-size: 12px;
+  color: #8e8e8e;
+  font-weight: bold;
+}
+
+.facebook {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.facebook span {
+  background: #1877f2;
+  color: white;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+.facebook a {
+  color: #385185;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.forgot {
+  font-size: 12px;
+  color: #00376b;
+  text-decoration: none;
+  display: block;
+  margin-top: 15px;
+}
+
+.signup {
+  max-width: 350px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #dbdbdb;
+  text-align: center;
+  font-size: 14px;
+  background: white;
+  width: 100%;
+}
+
+.signup a {
+  color: #0095f6;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 11px;
+  color: #8e8e8e;
+  padding: 0 20px;
+  max-width: 800px;
+  line-height: 1.5;
+}
+/* Animation pour le bouton de chargement */
+.login-btn:disabled {
+    background: #b2dffc !important;
+    cursor: not-allowed !important;
+    opacity: 0.7 !important;
+}
+
+/* Animation de chargement subtile */
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 0.9; }
+    100% { opacity: 0.7; }
+}
+
+.login-btn:disabled {
+    animation: pulse 1.5s infinite;
+}
+
+/* Empêcher la sélection de texte */
+body {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Autoriser la sélection dans les champs de saisie */
+input {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
